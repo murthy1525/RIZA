@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const os = require('os');
+const fs = require('fs');
 
 const app = express();
 
@@ -9,7 +10,26 @@ const angularDistPath = path.join(__dirname, '..', 'client', 'dist', 'client', '
 app.use(express.static(angularDistPath));
 
 app.use((req, res) => {
-  res.sendFile(path.join(angularDistPath, 'index.csr.html'));
+  // Try index.csr.html first, then index.html
+  const csrFile = path.join(angularDistPath, 'index.csr.html');
+  const htmlFile = path.join(angularDistPath, 'index.html');
+  
+  if (fs.existsSync(csrFile)) {
+    res.sendFile(csrFile);
+  } else if (fs.existsSync(htmlFile)) {
+    res.sendFile(htmlFile);
+  } else {
+    res.status(503).send(`
+      <html>
+        <head><title>Build in Progress</title></head>
+        <body style="font-family: Arial; text-align: center; padding: 50px;">
+          <h1>⏳ Build in Progress</h1>
+          <p>The application is being built. Please wait a moment and refresh.</p>
+          <p>If this message persists, run: <code>cd client && npm run build</code></p>
+        </body>
+      </html>
+    `);
+  }
 });
 
 const PORT = process.env.PORT || 4000;
