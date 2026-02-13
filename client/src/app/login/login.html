@@ -1,0 +1,68 @@
+<div class="login-container">
+  <!-- Video Background -->
+  <video 
+    #backgroundVideo
+    class="background-video" 
+    autoplay 
+    muted 
+    loop 
+    playsinline 
+    preload="auto"
+    (error)="onVideoError()" 
+    (loadeddata)="onVideoLoaded()"
+    (canplay)="onVideoCanPlay()">
+    <source src="assets/videos/rizabackground.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <!-- Video Overlay for better contrast -->
+  <div class="video-overlay"></div>
+
+  <!-- Classic Login Form -->
+  <div class="login-card">
+    <div class="logo-section">
+      <img src="assets/images/riza-logo.png" alt="RIZA Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="logo-text" style="display: none;">
+        <h1 class="restaurant-name">RIZA</h1>
+        <p class="tagline">Where Every Bite Feels Like Home</p>
+      </div>
+    </div>
+    
+    <div class="login-form">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Enter your mobile number to continue</p>
+      
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <div class="input-group">
+          <input
+            type="tel"
+            id="mobile"
+            name="mobile"
+            [(ngModel)]="mobileNumber"
+            placeholder="Enter mobile number"
+            class="mobile-input"
+            maxlength="10"
+            pattern="[0-9]*"
+            inputmode="numeric"
+            required
+            autocomplete="tel"
+            [disabled]="isLoading"
+          />
+        </div>
+        
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+        
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="isLoading || !mobileNumber.trim()"
+        >
+          <span *ngIf="!isLoading">Enter</span>
+          <span *ngIf="isLoading">Verifying...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

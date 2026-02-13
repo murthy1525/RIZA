@@ -1,0 +1,736 @@
+<div class="restaurant-container">
+  <!-- Top Navigation -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="assets/images/riza-logo.png" alt="RIZA Logo" class="logo-image" onerror="this.style.display='none';" />
+        <div class="logo-text">
+          <h1>RIZA</h1>
+          <p class="tagline">Where Every Bite Feels Like Home</p>
+        </div>
+      </div>
+
+      <nav class="top-nav">
+        <button
+          *ngFor="let menu of topMenus"
+          class="top-nav-item"
+          [class.active]="selectedTopMenu === menu"
+          (click)="selectTopMenu(menu)"
+        >
+          {{ menu }}
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <span class="welcome-user">Welcome Ramya</span>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Side Menu (always visible) -->
+    <aside class="side-menu">
+      <h3 class="side-menu-title">{{ sideMenuTitle }}</h3>
+      <div class="side-menu-list">
+        <button
+          *ngFor="let item of currentSideMenu"
+          class="side-menu-item"
+          [class.active]="selectedSideMenuItem === item.id || (selectedTopMenu === 'Menu' && selectedCategoryId === item.id)"
+          (click)="selectSideMenuItem(item)"
+          [title]="item.description"
+        >
+          <span *ngIf="item.icon" class="side-menu-icon">{{ item.icon }}</span>
+          <span class="side-menu-label">{{ item.label }}</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="content-area">
+      <!-- Home Tab -->
+      <section *ngIf="selectedTopMenu === 'Home'" class="home-view">
+        <!-- Overview -->
+        <div *ngIf="selectedSideMenuItem === 'overview' || !selectedSideMenuItem">
+          <div class="hero">
+            <h2 class="hero-title">Overview</h2>
+            <p class="hero-subtitle">
+              Welcome to RIZA - Experience culinary excellence
+            </p>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-card">
+              <div class="feature-icon">🍽️</div>
+              <h3>Fine Dining</h3>
+              <p>Exquisite cuisine crafted by master chefs.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🌿</div>
+              <h3>Fresh Ingredients</h3>
+              <p>Locally sourced, seasonal produce.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">✨</div>
+              <h3>Ambiance</h3>
+              <p>Cozy lighting and music for every mood.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">👨‍🍳</div>
+              <h3>Expert Chefs</h3>
+              <p>Passionate chefs bringing years of culinary experience to your plate.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">⏱️</div>
+              <h3>Quick Service</h3>
+              <p>Thoughtfully planned kitchen flow ensures minimal waiting time.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🏡</div>
+              <h3>Family Friendly</h3>
+              <p>A welcoming space for family gatherings, kids and celebrations.</p>
+            </div>
+          </div>
+
+          <section class="home-description">
+            <div class="home-description-block">
+              <h3>Crafted Menus</h3>
+              <p>
+                From timeless classics to seasonal specials, every dish at RIZA is designed to balance
+                flavour, presentation and comfort. Our chefs carefully curate menus that work for
+                family dinners, celebrations and business meetups alike.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Warm Hospitality</h3>
+              <p>
+                Our team believes that great food tastes better with genuine smiles. Expect attentive,
+                friendly service, quick assistance and thoughtful recommendations every time you dine
+                with us.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Perfect Evenings</h3>
+              <p>
+                Soft lighting, curated music and a cozy interior come together to make every visit
+                feel special. Whether it's a quiet dinner for two or a lively family get‑together,
+                RIZA sets the right mood.
+              </p>
+            </div>
+          </section>
+        </div>
+
+        <!-- Features -->
+        <div *ngIf="selectedSideMenuItem === 'features'">
+          <div class="hero">
+            <h2 class="hero-title">Features</h2>
+            <p class="hero-subtitle">
+              Discover what makes RIZA special
+            </p>
+          </div>
+
+          <div class="feature-row">
+            <div class="feature-card">
+              <div class="feature-icon">🎯</div>
+              <h3>Quality First</h3>
+              <p>We source only the finest ingredients and maintain the highest standards in every dish we serve.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🌟</div>
+              <h3>Award Winning</h3>
+              <p>Recognized for excellence in culinary arts and customer service.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💎</div>
+              <h3>Premium Experience</h3>
+              <p>Every detail is carefully curated to provide you with an unforgettable dining experience.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🔥</div>
+              <h3>Innovative Cuisine</h3>
+              <p>Our chefs blend traditional recipes with modern techniques to create unique flavors.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🌍</div>
+              <h3>Global Inspiration</h3>
+              <p>Influences from around the world come together in our diverse menu offerings.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">❤️</div>
+              <h3>Passion Driven</h3>
+              <p>Every dish is prepared with love and dedication to bring you the best.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonials -->
+        <div *ngIf="selectedSideMenuItem === 'testimonials'">
+          <div class="hero">
+            <h2 class="hero-title">Testimonials</h2>
+            <p class="hero-subtitle">
+              What our guests say about us
+            </p>
+          </div>
+
+          <div class="reviews-grid">
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Priya Sharma</div>
+              </div>
+              <p class="review-text">"Amazing food and excellent service! The biryani was absolutely delicious. Highly recommend this place!"</p>
+              <div class="review-date">2 weeks ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Rahul Kumar</div>
+              </div>
+              <p class="review-text">"Best restaurant in town! The ambiance is perfect and the staff is very friendly. Will definitely come back!"</p>
+              <div class="review-date">1 month ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Anjali Mehta</div>
+              </div>
+              <p class="review-text">"Loved the Tandoori Paneer Bites! The chef's special dishes are a must-try. Great value for money."</p>
+              <div class="review-date">3 weeks ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Vikram Singh</div>
+              </div>
+              <p class="review-text">"Perfect place for family dinners. The food quality is consistent and the service is prompt. 5 stars!"</p>
+              <div class="review-date">1 week ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Sneha Patel</div>
+              </div>
+              <p class="review-text">"RIZA has become our go-to restaurant for special occasions. The food is always fresh and flavorful!"</p>
+              <div class="review-date">2 weeks ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Arjun Reddy</div>
+              </div>
+              <p class="review-text">"The service is outstanding and the menu has something for everyone. Highly recommend the family combos!"</p>
+              <div class="review-date">1 month ago</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Tab -->
+      <section *ngIf="selectedTopMenu === 'Menu'" class="menu-view">
+        <h2 class="section-title">{{ selectedCategory?.label }}</h2>
+        <p class="section-subtitle" *ngIf="selectedCategory">
+          {{ selectedCategory.description }}
+        </p>
+
+        <div *ngIf="selectedCategory" class="category-hero">
+          <div class="category-image" [ngClass]="'cat-image-' + selectedCategory.id">
+            <span *ngIf="selectedCategory.icon" class="category-icon">{{ selectedCategory.icon }}</span>
+          </div>
+          <div class="category-text">
+            <h3>{{ selectedCategory.label }}</h3>
+            <p>{{ selectedCategory.description }}</p>
+          </div>
+        </div>
+
+        <div class="items-grid" *ngIf="selectedCategory">
+          <article
+            class="menu-card"
+            *ngFor="let item of selectedCategory.items"
+            (click)="selectItem(item)"
+            [class.is-selected]="selectedItem === item"
+          >
+            <div class="menu-card-header">
+              <div class="item-main">
+                <span *ngIf="item.icon" class="item-icon">{{ item.icon }}</span>
+                <h3 class="item-name">{{ item.name }}</h3>
+              </div>
+              <span class="item-price">{{ item.price }}</span>
+            </div>
+            <p class="item-description">{{ item.description }}</p>
+            <span *ngIf="item.badge" class="item-badge">{{ item.badge }}</span>
+          </article>
+        </div>
+
+        <div *ngIf="selectedItem" class="item-detail-overlay" (click)="selectedItem = null">
+          <div class="selected-item-detail" (click)="$event.stopPropagation()">
+            <div class="selected-item-visual">
+              <div class="selected-item-image-wrapper">
+                <div class="selected-item-image">
+                  <span *ngIf="selectedItem.icon" class="image-icon">{{ selectedItem.icon }}</span>
+                </div>
+                <button class="close-detail-btn" (click)="selectedItem = null" title="Close">×</button>
+              </div>
+              <div class="selected-item-header">
+                <div class="selected-item-main">
+                  <span *ngIf="selectedItem.icon" class="selected-item-icon">{{ selectedItem.icon }}</span>
+                  <div class="selected-item-title-group">
+                    <h3 class="selected-item-name">{{ selectedItem.name }}</h3>
+                    <div *ngIf="selectedItem.rating" class="selected-item-rating">
+                      <span class="rating-stars">{{ getRatingStars(selectedItem.rating) }}</span>
+                      <span class="rating-value">{{ selectedItem.rating }}</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="selected-item-price">{{ selectedItem.price }}</span>
+              </div>
+            </div>
+
+            <div class="selected-item-content">
+              <p class="selected-item-description">
+                {{ selectedItem.description }}
+              </p>
+              <p *ngIf="selectedItem.detailedDescription" class="selected-item-detailed">
+                {{ selectedItem.detailedDescription }}
+              </p>
+              <span *ngIf="selectedItem.badge" class="selected-item-badge">{{ selectedItem.badge }}</span>
+              
+              <div *ngIf="selectedItem.options && selectedItem.options.length > 0" class="selected-item-options">
+                <h4 class="options-title">Available Options:</h4>
+                <ul class="options-list">
+                  <li *ngFor="let option of selectedItem.options" class="option-item">
+                    <span class="option-bullet">•</span>
+                    <span class="option-text">{{ option }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Offers Tab -->
+      <section *ngIf="selectedTopMenu === 'Offers'" class="offers-view">
+        <!-- Daily Offers -->
+        <div *ngIf="selectedSideMenuItem === 'daily' || !selectedSideMenuItem">
+          <h2 class="section-title">Daily Offers</h2>
+          <p class="section-subtitle">Today's special deals and discounts</p>
+          <ul class="offers-list">
+            <li>🔥 Happy Hours: 5 PM - 7 PM, flat 20% off on beverages.</li>
+            <li>🍕 Buy 1 Get 1 on Signature Pizzas (Tuesdays only).</li>
+            <li>🎂 Complimentary dessert on birthdays and anniversaries.</li>
+            <li>🍛 15% off on all main course items (Monday to Friday).</li>
+            <li>🥤 Free refills on soft drinks with any combo meal.</li>
+          </ul>
+        </div>
+
+        <!-- Happy Hours -->
+        <div *ngIf="selectedSideMenuItem === 'happy-hours'">
+          <h2 class="section-title">Happy Hours</h2>
+          <p class="section-subtitle">Special timings with great offers</p>
+          <ul class="offers-list">
+            <li>⏰ 5:00 PM - 7:00 PM: 20% off on all beverages</li>
+            <li>🍹 30% off on mocktails and fresh juices</li>
+            <li>☕ Buy 2 Cold Coffee, Get 1 Free</li>
+            <li>🥤 All soft drinks at 50% off</li>
+            <li>🍰 15% off on desserts during happy hours</li>
+          </ul>
+        </div>
+
+        <!-- Weekend Specials -->
+        <div *ngIf="selectedSideMenuItem === 'weekend'">
+          <h2 class="section-title">Weekend Specials</h2>
+          <p class="section-subtitle">Exclusive weekend offers</p>
+          <ul class="offers-list">
+            <li>🎉 Saturday & Sunday: 25% off on family combos</li>
+            <li>👨‍👩‍👧‍👦 Family Feast: Special weekend pricing</li>
+            <li>🍽️ Weekend Brunch: 20% off on breakfast items (10 AM - 2 PM)</li>
+            <li>🎂 Weekend Dessert Special: Buy 2 Get 1 Free on all desserts</li>
+            <li>🍕 Weekend Pizza Special: 30% off on all pizzas</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Reservations Tab -->
+      <section *ngIf="selectedTopMenu === 'Reservations'" class="about-view">
+        <!-- Book a Table -->
+        <div *ngIf="selectedSideMenuItem === 'book-table' || !selectedSideMenuItem">
+          <h2 class="section-title">Book a Table</h2>
+          <p class="section-subtitle">Reserve your table in advance</p>
+          <p>
+            Reserve your table in advance to enjoy a seamless dining experience. We offer cozy corners
+            for couples, large tables for families, and private sections for special celebrations.
+          </p>
+          <div class="contact-block">
+            <p><strong>Call to Reserve:</strong> 8074713306</p>
+            <p><strong>Timings:</strong> 11:00 AM - 10:30 PM (all days)</p>
+            <p><strong>Advance Booking:</strong> Recommended for weekends and holidays.</p>
+            <p><strong>Table Types:</strong> Window seats, corner tables, family tables available</p>
+          </div>
+        </div>
+
+        <!-- Private Dining -->
+        <div *ngIf="selectedSideMenuItem === 'private-dining'">
+          <h2 class="section-title">Private Dining</h2>
+          <p class="section-subtitle">Private sections for celebrations</p>
+          <p>
+            Celebrate your special moments in our exclusive private dining areas. Perfect for birthdays,
+            anniversaries, corporate dinners, and intimate gatherings.
+          </p>
+          <div class="contact-block">
+            <p><strong>Capacity:</strong> 10-50 guests</p>
+            <p><strong>Special Menu:</strong> Customized menu options available</p>
+            <p><strong>Decorations:</strong> We can arrange special decorations on request</p>
+            <p><strong>Booking:</strong> Advance booking required (minimum 3 days)</p>
+            <p><strong>Contact:</strong> 8074713306</p>
+          </div>
+        </div>
+
+        <!-- Events & Catering -->
+        <div *ngIf="selectedSideMenuItem === 'events'">
+          <h2 class="section-title">Events & Catering</h2>
+          <p class="section-subtitle">Host your events with us</p>
+          <p>
+            Let RIZA cater your events, whether it's a corporate gathering, wedding reception, or
+            any special celebration. We bring the same quality and taste to your venue.
+          </p>
+          <div class="contact-block">
+            <p><strong>Services:</strong> On-site catering, off-site catering, event planning</p>
+            <p><strong>Menu Options:</strong> Buffet, plated meals, cocktail menus</p>
+            <p><strong>Minimum Order:</strong> 20 guests</p>
+            <p><strong>Advance Booking:</strong> Required (minimum 1 week)</p>
+            <p><strong>Contact:</strong> 8074713306 or email: events@riza-restaurant.com</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery Tab -->
+      <section *ngIf="selectedTopMenu === 'Gallery'" class="about-view">
+        <!-- Food Gallery -->
+        <div *ngIf="selectedSideMenuItem === 'food' || !selectedSideMenuItem">
+          <h2 class="section-title">Food Gallery</h2>
+          <p class="section-subtitle">Mouth-watering dishes from our kitchen</p>
+          <p>
+            Explore our culinary creations through stunning visuals. From perfectly plated appetizers
+            to decadent desserts, every dish is a work of art crafted with passion and precision.
+          </p>
+          <div class="feature-row">
+            <div class="feature-card">
+              <div class="feature-icon">🍛</div>
+              <h3>Signature Biryani</h3>
+              <p>Our award-winning biryani, slow-cooked to perfection.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🍕</div>
+              <h3>Wood-Fired Pizzas</h3>
+              <p>Crispy crusts with premium toppings.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🍰</div>
+              <h3>Artisan Desserts</h3>
+              <p>Indulgent sweets that satisfy every craving.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ambiance -->
+        <div *ngIf="selectedSideMenuItem === 'ambiance'">
+          <h2 class="section-title">Ambiance</h2>
+          <p class="section-subtitle">Our cozy and warm interiors</p>
+          <p>
+            Step into RIZA and experience our thoughtfully designed space. Warm lighting, comfortable
+            seating, and elegant decor create the perfect atmosphere for any occasion.
+          </p>
+          <div class="feature-row">
+            <div class="feature-card">
+              <div class="feature-icon">🕯️</div>
+              <h3>Intimate Lighting</h3>
+              <p>Soft, warm lights create a cozy dining atmosphere.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🪑</div>
+              <h3>Comfortable Seating</h3>
+              <p>Spacious tables and ergonomic chairs for your comfort.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🎵</div>
+              <h3>Curated Music</h3>
+              <p>Background music that enhances your dining experience.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events -->
+        <div *ngIf="selectedSideMenuItem === 'events'">
+          <h2 class="section-title">Events</h2>
+          <p class="section-subtitle">Special moments at RIZA</p>
+          <p>
+            Capture the magic of celebrations at RIZA. From intimate dinners to grand celebrations,
+            we've hosted countless memorable moments.
+          </p>
+          <div class="feature-row">
+            <div class="feature-card">
+              <div class="feature-icon">🎂</div>
+              <h3>Birthday Celebrations</h3>
+              <p>Make birthdays extra special with our celebration packages.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💍</div>
+              <h3>Anniversaries</h3>
+              <p>Romantic settings for your special milestones.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🎊</div>
+              <h3>Corporate Events</h3>
+              <p>Professional spaces for business gatherings.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Tab -->
+      <section *ngIf="selectedTopMenu === 'Contact'" class="about-view">
+        <!-- Phone -->
+        <div *ngIf="selectedSideMenuItem === 'phone' || !selectedSideMenuItem">
+          <h2 class="section-title">Phone</h2>
+          <p class="section-subtitle">Call us for reservations and inquiries</p>
+          <p>
+            Reach out to us via phone for quick assistance with reservations, menu inquiries,
+            or any questions you may have.
+          </p>
+          <div class="contact-block">
+            <p><strong>Main Number:</strong> 8074713306</p>
+            <p><strong>Reservations:</strong> 8074713306</p>
+            <p><strong>Timings:</strong> 11:00 AM - 11:00 PM (all days)</p>
+            <p><strong>Best Time to Call:</strong> 11:00 AM - 2:00 PM, 6:00 PM - 9:00 PM</p>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div *ngIf="selectedSideMenuItem === 'email'">
+          <h2 class="section-title">Email</h2>
+          <p class="section-subtitle">Send us your feedback and queries</p>
+          <p>
+            Prefer to write? Send us an email and we'll get back to you within 24 hours.
+            We value your feedback and suggestions.
+          </p>
+          <div class="contact-block">
+            <p><strong>General Inquiries:</strong> contact@riza-restaurant.com</p>
+            <p><strong>Reservations:</strong> reservations@riza-restaurant.com</p>
+            <p><strong>Events & Catering:</strong> events@riza-restaurant.com</p>
+            <p><strong>Feedback:</strong> feedback@riza-restaurant.com</p>
+            <p><strong>Response Time:</strong> Within 24 hours</p>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div *ngIf="selectedSideMenuItem === 'location'">
+          <h2 class="section-title">Location</h2>
+          <p class="section-subtitle">Find us on the map</p>
+          <p>
+            Visit us at our conveniently located restaurant. We're easily accessible and offer
+            ample parking space for your convenience.
+          </p>
+          <div class="contact-block">
+            <p><strong>Address:</strong> 123 Foodie Street, Gourmet City, 000000</p>
+            <p><strong>Landmark:</strong> Near City Center, opposite Central Park</p>
+            <p><strong>Parking:</strong> Free parking available</p>
+            <p><strong>Public Transport:</strong> 5 minutes walk from Metro Station</p>
+            <p><strong>Opening Hours:</strong> Mon-Sun: 11:00 AM - 11:00 PM</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Tab -->
+      <section *ngIf="selectedTopMenu === 'About'" class="about-view">
+        <!-- Our Story -->
+        <div *ngIf="selectedSideMenuItem === 'story' || !selectedSideMenuItem">
+          <h2 class="section-title">Our Story</h2>
+          <p class="section-subtitle">The journey of RIZA</p>
+          <p>
+            RIZA was born from a simple dream: to create a place where food brings people together.
+            Founded in 2020, we started as a small family restaurant with a passion for authentic
+            flavors and warm hospitality.
+          </p>
+          <p>
+            Over the years, we've grown from a neighborhood favorite to a culinary destination,
+            but our core values remain unchanged. We believe in using fresh, locally-sourced
+            ingredients, preparing each dish with care, and treating every guest like family.
+          </p>
+          <div class="home-description">
+            <div class="home-description-block">
+              <h3>Our Beginning</h3>
+              <p>
+                Started with a vision to serve authentic, flavorful food in a warm, welcoming
+                environment. What began as a small venture has grown into a beloved community restaurant.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Our Growth</h3>
+              <p>
+                Through dedication to quality and customer satisfaction, RIZA has earned the trust
+                and love of thousands of guests who return time and again.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Our Future</h3>
+              <p>
+                We continue to innovate while staying true to our roots, always striving to exceed
+                expectations and create memorable dining experiences.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Our Team -->
+        <div *ngIf="selectedSideMenuItem === 'team'">
+          <h2 class="section-title">Our Team</h2>
+          <p class="section-subtitle">Meet the people behind RIZA</p>
+          <p>
+            Our success is built on the dedication and passion of our incredible team. From our
+            master chefs to our friendly service staff, everyone at RIZA is committed to making
+            your dining experience exceptional.
+          </p>
+          <div class="feature-row">
+            <div class="feature-card">
+              <div class="feature-icon">👨‍🍳</div>
+              <h3>Master Chefs</h3>
+              <p>Experienced chefs with years of culinary expertise, bringing innovation to traditional recipes.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">👥</div>
+              <h3>Service Team</h3>
+              <p>Friendly and attentive staff dedicated to ensuring your comfort and satisfaction.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🌿</div>
+              <h3>Kitchen Staff</h3>
+              <p>Skilled professionals who maintain the highest standards of hygiene and quality.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">💼</div>
+              <h3>Management</h3>
+              <p>Leadership team committed to continuous improvement and excellence.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Our Values -->
+        <div *ngIf="selectedSideMenuItem === 'values'">
+          <h2 class="section-title">Our Values</h2>
+          <p class="section-subtitle">What we stand for</p>
+          <p>
+            At RIZA, our values guide everything we do. They shape our menu, our service, and our
+            commitment to creating exceptional experiences for every guest.
+          </p>
+          <div class="home-description">
+            <div class="home-description-block">
+              <h3>Quality First</h3>
+              <p>
+                We never compromise on quality. Every ingredient is carefully selected, and every
+                dish is prepared with meticulous attention to detail.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Customer Centric</h3>
+              <p>
+                Your satisfaction is our priority. We listen to feedback, adapt to preferences,
+                and go the extra mile to ensure you leave happy.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Integrity</h3>
+              <p>
+                We believe in honest pricing, transparent practices, and building trust through
+                consistent, reliable service.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Innovation</h3>
+              <p>
+                While respecting tradition, we continuously innovate to bring you new flavors and
+                exciting culinary experiences.
+              </p>
+            </div>
+            <div class="home-description-block">
+              <h3>Community</h3>
+              <p>
+                We're more than a restaurant - we're part of the community, supporting local
+                suppliers and giving back whenever possible.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-block">
+          <p><strong>Phone:</strong> 8074713306</p>
+          <p><strong>Hours:</strong> Mon-Sun: 11:00 AM - 11:00 PM</p>
+          <p><strong>Location:</strong> 123 Foodie Street, Gourmet City, 000000</p>
+        </div>
+
+        <div class="social-block">
+          <h3 class="social-title">Connect with us</h3>
+          <div class="social-cards">
+            <div class="social-card">
+              <div class="social-card-icon">📸</div>
+              <h4 class="social-card-label">Instagram</h4>
+              <p class="social-card-value">@riza_restaurant</p>
+            </div>
+            <div class="social-card">
+              <div class="social-card-icon">🐦</div>
+              <h4 class="social-card-label">Twitter</h4>
+              <p class="social-card-value">@riza_restaurant</p>
+            </div>
+            <div class="social-card">
+              <div class="social-card-icon">📱</div>
+              <h4 class="social-card-label">WhatsApp</h4>
+              <p class="social-card-value">+91 80747 13306</p>
+            </div>
+            <div class="social-card">
+              <div class="social-card-icon">📍</div>
+              <h4 class="social-card-label">Location</h4>
+              <p class="social-card-value">123 Foodie Street, Gourmet City, 000000</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reviews-block">
+          <h3 class="reviews-title">Google Reviews</h3>
+          <div class="reviews-grid">
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Priya Sharma</div>
+              </div>
+              <p class="review-text">"Amazing food and excellent service! The biryani was absolutely delicious. Highly recommend this place!"</p>
+              <div class="review-date">2 weeks ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Rahul Kumar</div>
+              </div>
+              <p class="review-text">"Best restaurant in town! The ambiance is perfect and the staff is very friendly. Will definitely come back!"</p>
+              <div class="review-date">1 month ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Anjali Mehta</div>
+              </div>
+              <p class="review-text">"Loved the Tandoori Paneer Bites! The chef's special dishes are a must-try. Great value for money."</p>
+              <div class="review-date">3 weeks ago</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-rating">⭐⭐⭐⭐⭐</div>
+                <div class="review-name">Vikram Singh</div>
+              </div>
+              <p class="review-text">"Perfect place for family dinners. The food quality is consistent and the service is prompt. 5 stars!"</p>
+              <div class="review-date">1 week ago</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
