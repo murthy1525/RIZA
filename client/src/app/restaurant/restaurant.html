@@ -254,7 +254,9 @@
                 <span *ngIf="item.icon" class="item-icon">{{ item.icon }}</span>
                 <h3 class="item-name">{{ item.name }}</h3>
               </div>
-              <span class="item-price">{{ item.price }}</span>
+              <div class="price-card">
+                <span class="item-price">{{ item.price }}</span>
+              </div>
             </div>
             <p class="item-description">{{ item.description }}</p>
             <span *ngIf="item.badge" class="item-badge">{{ item.badge }}</span>
@@ -281,7 +283,9 @@
                     </div>
                   </div>
                 </div>
-                <span class="selected-item-price">{{ selectedItem.price }}</span>
+                <div class="price-card">
+                  <span class="selected-item-price">{{ selectedItem.price }}</span>
+                </div>
               </div>
             </div>
 
@@ -352,36 +356,137 @@
 
       <!-- Reservations Tab -->
       <section *ngIf="selectedTopMenu === 'Reservations'" class="about-view">
-        <!-- Book a Table -->
-        <div *ngIf="selectedSideMenuItem === 'book-table' || !selectedSideMenuItem">
-          <h2 class="section-title">Book a Table</h2>
-          <p class="section-subtitle">Reserve your table in advance</p>
-          <p>
-            Reserve your table in advance to enjoy a seamless dining experience. We offer cozy corners
-            for couples, large tables for families, and private sections for special celebrations.
-          </p>
-          <div class="contact-block">
-            <p><strong>Call to Reserve:</strong> 8074713306</p>
-            <p><strong>Timings:</strong> 11:00 AM - 10:30 PM (all days)</p>
-            <p><strong>Advance Booking:</strong> Recommended for weekends and holidays.</p>
-            <p><strong>Table Types:</strong> Window seats, corner tables, family tables available</p>
-          </div>
-        </div>
+        <!-- Book a Table / Private Room -->
+        <div *ngIf="selectedSideMenuItem === 'book-table' || selectedSideMenuItem === 'private-dining' || !selectedSideMenuItem">
+          <h2 class="section-title">Book Your Table or Room</h2>
+          <p class="section-subtitle">Select a table or private room and complete your reservation</p>
 
-        <!-- Private Dining -->
-        <div *ngIf="selectedSideMenuItem === 'private-dining'">
-          <h2 class="section-title">Private Dining</h2>
-          <p class="section-subtitle">Private sections for celebrations</p>
-          <p>
-            Celebrate your special moments in our exclusive private dining areas. Perfect for birthdays,
-            anniversaries, corporate dinners, and intimate gatherings.
-          </p>
-          <div class="contact-block">
-            <p><strong>Capacity:</strong> 10-50 guests</p>
-            <p><strong>Special Menu:</strong> Customized menu options available</p>
-            <p><strong>Decorations:</strong> We can arrange special decorations on request</p>
-            <p><strong>Booking:</strong> Advance booking required (minimum 3 days)</p>
-            <p><strong>Contact:</strong> 8074713306</p>
+          <!-- Booking Tabs -->
+          <div class="booking-tabs">
+            <button 
+              class="booking-tab" 
+              [class.active]="bookingTab === 'table'"
+              (click)="selectBookingTab('table')"
+            >
+              🪑 Tables
+            </button>
+            <button 
+              class="booking-tab" 
+              [class.active]="bookingTab === 'room'"
+              (click)="selectBookingTab('room')"
+            >
+              🏠 Private Rooms
+            </button>
+          </div>
+
+          <!-- Success Message -->
+          <div *ngIf="bookingSuccess" class="booking-success">
+            <h3>✅ Booking Confirmed!</h3>
+            <p>Your reservation for {{ selectedTable?.type === 'table' ? 'Table' : 'Room' }} {{ selectedTable?.number }} has been confirmed.</p>
+            <p>Date: {{ bookingForm.date }} | Time: {{ bookingForm.time }}</p>
+          </div>
+
+          <!-- Tables/Rooms Selection (like bus seats) -->
+          <div *ngIf="!showBookingForm && !bookingSuccess" class="booking-selection">
+            <h3 class="booking-subtitle">
+              Select a {{ bookingTab === 'table' ? 'Table' : 'Private Room' }}
+            </h3>
+            <div class="table-grid">
+              <div
+                *ngFor="let table of (bookingTab === 'table' ? tables : rooms)"
+                class="table-seat"
+                [class.available]="table.status === 'available'"
+                [class.booked]="table.status === 'booked'"
+                [class.selected]="table.status === 'selected'"
+                (click)="selectTable(table)"
+                [title]="table.status === 'booked' ? 'Already Booked' : 'Table ' + table.number + ' - Capacity: ' + table.capacity"
+              >
+                <div class="table-number">{{ table.number }}</div>
+                <div class="table-capacity">👥 {{ table.capacity }}</div>
+                <div class="table-status">
+                  <span *ngIf="table.status === 'available'">✓ Available</span>
+                  <span *ngIf="table.status === 'booked'">✗ Booked</span>
+                  <span *ngIf="table.status === 'selected'">★ Selected</span>
+                </div>
+              </div>
+            </div>
+            <div class="table-legend">
+              <div class="legend-item">
+                <span class="legend-color available"></span>
+                <span>Available</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color booked"></span>
+                <span>Booked</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color selected"></span>
+                <span>Selected</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Form -->
+          <div *ngIf="showBookingForm && !bookingSuccess" class="booking-form-container">
+            <h3 class="booking-subtitle">
+              Booking Details for {{ selectedTable?.type === 'table' ? 'Table' : 'Room' }} {{ selectedTable?.number }}
+            </h3>
+            <form class="booking-form" (ngSubmit)="submitBooking()">
+              <div class="form-group">
+                <label for="mobileNumber">Mobile Number *</label>
+                <input
+                  type="tel"
+                  id="mobileNumber"
+                  [(ngModel)]="bookingForm.mobileNumber"
+                  name="mobileNumber"
+                  placeholder="Enter your mobile number"
+                  required
+                  maxlength="10"
+                  pattern="[0-9]{10}"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="date">Date *</label>
+                <input
+                  type="date"
+                  id="date"
+                  [(ngModel)]="bookingForm.date"
+                  name="date"
+                  [min]="getMinDate()"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="time">Time *</label>
+                <input
+                  type="time"
+                  id="time"
+                  [(ngModel)]="bookingForm.time"
+                  name="time"
+                  min="11:00"
+                  max="22:30"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="requests">Special Requests (Optional)</label>
+                <textarea
+                  id="requests"
+                  [(ngModel)]="bookingForm.requests"
+                  name="requests"
+                  placeholder="Any special requests, dietary requirements, or preferences..."
+                  rows="4"
+                ></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="cancel-btn" (click)="cancelBooking()">Cancel</button>
+                <button type="submit" class="submit-btn">Confirm Booking</button>
+              </div>
+            </form>
           </div>
         </div>
 

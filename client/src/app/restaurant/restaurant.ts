@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Auth } from '../auth';
 
@@ -29,10 +30,30 @@ interface SideMenuItem {
   icon?: string;
 }
 
+interface Table {
+  id: string;
+  number: number;
+  capacity: number;
+  type: 'table' | 'room';
+  status: 'available' | 'booked' | 'selected';
+}
+
+interface Booking {
+  id: string;
+  tableId: string;
+  tableNumber: number;
+  type: 'table' | 'room';
+  mobileNumber: string;
+  date: string;
+  time: string;
+  requests: string;
+  bookingDate: string;
+}
+
 @Component({
   selector: 'app-restaurant',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './restaurant.html',
   styleUrl: './restaurant.css',
 })
@@ -157,6 +178,20 @@ export class Restaurant {
   selectedCategoryId: string = 'starters';
   selectedItem: MenuItem | null = null;
 
+  // Booking system
+  bookingTab: 'table' | 'room' = 'table';
+  tables: Table[] = [];
+  rooms: Table[] = [];
+  selectedTable: Table | null = null;
+  bookingForm = {
+    mobileNumber: '',
+    date: '',
+    time: '',
+    requests: ''
+  };
+  showBookingForm: boolean = false;
+  bookingSuccess: boolean = false;
+
   // Side menu items for each top menu
   homeSideMenu: SideMenuItem[] = [
     { id: 'overview', label: 'Overview', description: 'Welcome to RIZA - Experience culinary excellence', icon: '🏠' },
@@ -208,7 +243,207 @@ export class Restaurant {
   constructor(
     private authService: Auth,
     private router: Router
-  ) {}
+  ) {
+    this.initializeTables();
+    this.loadBookings();
+  }
+
+  initializeTables(): void {
+    // Regular tables (like bus seats)
+    this.tables = [
+      { id: 't1', number: 1, capacity: 2, type: 'table', status: 'available' },
+      { id: 't2', number: 2, capacity: 2, type: 'table', status: 'available' },
+      { id: 't3', number: 3, capacity: 4, type: 'table', status: 'available' },
+      { id: 't4', number: 4, capacity: 4, type: 'table', status: 'available' },
+      { id: 't5', number: 5, capacity: 2, type: 'table', status: 'available' },
+      { id: 't6', number: 6, capacity: 4, type: 'table', status: 'available' },
+      { id: 't7', number: 7, capacity: 6, type: 'table', status: 'available' },
+      { id: 't8', number: 8, capacity: 2, type: 'table', status: 'available' },
+      { id: 't9', number: 9, capacity: 4, type: 'table', status: 'available' },
+      { id: 't10', number: 10, capacity: 4, type: 'table', status: 'available' },
+      { id: 't11', number: 11, capacity: 2, type: 'table', status: 'available' },
+      { id: 't12', number: 12, capacity: 6, type: 'table', status: 'available' }
+    ];
+
+    // Private rooms
+    this.rooms = [
+      { id: 'r1', number: 1, capacity: 8, type: 'room', status: 'available' },
+      { id: 'r2', number: 2, capacity: 10, type: 'room', status: 'available' },
+      { id: 'r3', number: 3, capacity: 12, type: 'room', status: 'available' },
+      { id: 'r4', number: 4, capacity: 15, type: 'room', status: 'available' },
+      { id: 'r5', number: 5, capacity: 20, type: 'room', status: 'available' }
+    ];
+  }
+
+  loadBookings(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const bookingsJson = localStorage.getItem('rizaBookings');
+      if (bookingsJson) {
+        const bookings: Booking[] = JSON.parse(bookingsJson);
+        this.updateTableAvailability(bookings);
+      }
+    }
+  }
+
+  updateTableAvailability(bookings: Booking[]): void {
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date().toTimeString().split(':').slice(0, 2).join(':');
+
+    bookings.forEach(booking => {
+      const bookingDateTime = new Date(`${booking.date}T${booking.time}`);
+      const isPast = booking.date < today || (booking.date === today && booking.time < now);
+
+      if (!isPast) {
+        const targetList = booking.type === 'table' ? this.tables : this.rooms;
+        const table = targetList.find(t => t.id === booking.tableId);
+        if (table) {
+          table.status = 'booked';
+        }
+      }
+    });
+  }
+
+  getBookings(): Booking[] {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const bookingsJson = localStorage.getItem('rizaBookings');
+      return bookingsJson ? JSON.parse(bookingsJson) : [];
+    }
+    return [];
+  }
+
+  saveBooking(booking: Booking): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const bookings = this.getBookings();
+      bookings.push(booking);
+      localStorage.setItem('rizaBookings', JSON.stringify(bookings));
+    }
+  }
+
+  isTableAvailable(table: Table, date: string, time: string): boolean {
+    if (table.status === 'booked') {
+      const bookings = this.getBookings();
+      const conflictingBooking = bookings.find(b => 
+        b.tableId === table.id && 
+        b.date === date && 
+        b.time === time
+      );
+      return !conflictingBooking;
+    }
+    return table.status === 'available';
+  }
+
+  selectBookingTab(tab: 'table' | 'room'): void {
+    this.bookingTab = tab;
+    this.selectedTable = null;
+    this.showBookingForm = false;
+    this.bookingSuccess = false;
+  }
+
+  selectTable(table: Table): void {
+    if (table.status === 'booked') {
+      return;
+    }
+
+    // Reset previous selection
+    if (this.bookingTab === 'table') {
+      this.tables.forEach(t => {
+        if (t.status === 'selected' && t.id !== table.id) {
+          t.status = 'available';
+        }
+      });
+    } else {
+      this.rooms.forEach(r => {
+        if (r.status === 'selected' && r.id !== table.id) {
+          r.status = 'available';
+        }
+      });
+    }
+
+    table.status = 'selected';
+    this.selectedTable = table;
+    this.showBookingForm = true;
+    this.bookingSuccess = false;
+    this.bookingForm = {
+      mobileNumber: '',
+      date: '',
+      time: '',
+      requests: ''
+    };
+  }
+
+  submitBooking(): void {
+    if (!this.selectedTable) return;
+
+    if (!this.bookingForm.mobileNumber.trim()) {
+      alert('Please enter your mobile number');
+      return;
+    }
+
+    if (!this.bookingForm.date) {
+      alert('Please select a date');
+      return;
+    }
+
+    if (!this.bookingForm.time) {
+      alert('Please select a time');
+      return;
+    }
+
+    // Check if table is available for selected date/time
+    if (!this.isTableAvailable(this.selectedTable, this.bookingForm.date, this.bookingForm.time)) {
+      alert('This table is already booked for the selected date and time. Please choose another time or table.');
+      return;
+    }
+
+    const booking: Booking = {
+      id: `booking_${Date.now()}`,
+      tableId: this.selectedTable.id,
+      tableNumber: this.selectedTable.number,
+      type: this.selectedTable.type,
+      mobileNumber: this.bookingForm.mobileNumber,
+      date: this.bookingForm.date,
+      time: this.bookingForm.time,
+      requests: this.bookingForm.requests || '',
+      bookingDate: new Date().toISOString()
+    };
+
+    this.saveBooking(booking);
+    this.selectedTable.status = 'booked';
+    this.bookingSuccess = true;
+    this.showBookingForm = false;
+
+    // Reset after 3 seconds
+    setTimeout(() => {
+      this.selectedTable = null;
+      this.bookingSuccess = false;
+      this.bookingForm = {
+        mobileNumber: '',
+        date: '',
+        time: '',
+        requests: ''
+      };
+    }, 3000);
+  }
+
+  cancelBooking(): void {
+    if (this.selectedTable) {
+      this.selectedTable.status = 'available';
+    }
+    this.selectedTable = null;
+    this.showBookingForm = false;
+    this.bookingSuccess = false;
+    this.bookingForm = {
+      mobileNumber: '',
+      date: '',
+      time: '',
+      requests: ''
+    };
+  }
+
+  getMinDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  }
 
   get selectedCategory(): MenuCategory | undefined {
     return this.categories.find(c => c.id === this.selectedCategoryId);
