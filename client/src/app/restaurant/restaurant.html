@@ -29,8 +29,16 @@
   </header>
 
   <main class="layout">
-    <!-- Side Menu (always visible) -->
-    <aside class="side-menu">
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+      <span class="hamburger-icon">☰</span>
+    </button>
+
+    <!-- Side Menu Overlay (Mobile) -->
+    <div class="side-menu-overlay" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+
+    <!-- Side Menu -->
+    <aside class="side-menu" [class.mobile-open]="mobileMenuOpen">
       <h3 class="side-menu-title">{{ sideMenuTitle }}</h3>
       <div class="side-menu-list">
         <button
@@ -40,7 +48,8 @@
           (click)="selectSideMenuItem(item)"
           [title]="item.description"
         >
-          <span *ngIf="item.icon" class="side-menu-icon">{{ item.icon }}</span>
+          <img *ngIf="item.icon && isImageUrl(item.icon)" [src]="item.icon" [alt]="item.label" class="side-menu-icon" />
+          <span *ngIf="item.icon && !isImageUrl(item.icon)" class="side-menu-icon">{{ item.icon }}</span>
           <span class="side-menu-label">{{ item.label }}</span>
         </button>
       </div>
@@ -60,35 +69,11 @@
           </div>
 
           <div class="feature-row">
-            <div class="feature-card">
-              <div class="feature-icon">🍽️</div>
-              <h3>Fine Dining</h3>
-              <p>Exquisite cuisine crafted by master chefs.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🌿</div>
-              <h3>Fresh Ingredients</h3>
-              <p>Locally sourced, seasonal produce.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">✨</div>
-              <h3>Ambiance</h3>
-              <p>Cozy lighting and music for every mood.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">👨‍🍳</div>
-              <h3>Expert Chefs</h3>
-              <p>Passionate chefs bringing years of culinary experience to your plate.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">⏱️</div>
-              <h3>Quick Service</h3>
-              <p>Thoughtfully planned kitchen flow ensures minimal waiting time.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🏡</div>
-              <h3>Family Friendly</h3>
-              <p>A welcoming space for family gatherings, kids and celebrations.</p>
+            <div class="feature-card" *ngFor="let feature of overviewFeatures">
+              <img *ngIf="feature.icon && isImageUrl(feature.icon)" [src]="feature.icon" [alt]="feature.title" class="feature-icon" />
+              <span *ngIf="feature.icon && !isImageUrl(feature.icon)" class="feature-icon">{{ feature.icon }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
             </div>
           </div>
 
@@ -130,35 +115,11 @@
           </div>
 
           <div class="feature-row">
-            <div class="feature-card">
-              <div class="feature-icon">🎯</div>
-              <h3>Quality First</h3>
-              <p>We source only the finest ingredients and maintain the highest standards in every dish we serve.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🌟</div>
-              <h3>Award Winning</h3>
-              <p>Recognized for excellence in culinary arts and customer service.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">💎</div>
-              <h3>Premium Experience</h3>
-              <p>Every detail is carefully curated to provide you with an unforgettable dining experience.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🔥</div>
-              <h3>Innovative Cuisine</h3>
-              <p>Our chefs blend traditional recipes with modern techniques to create unique flavors.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🌍</div>
-              <h3>Global Inspiration</h3>
-              <p>Influences from around the world come together in our diverse menu offerings.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">❤️</div>
-              <h3>Passion Driven</h3>
-              <p>Every dish is prepared with love and dedication to bring you the best.</p>
+            <div class="feature-card" *ngFor="let feature of featuresList">
+              <img *ngIf="feature.icon && isImageUrl(feature.icon)" [src]="feature.icon" [alt]="feature.title" class="feature-icon" />
+              <span *ngIf="feature.icon && !isImageUrl(feature.icon)" class="feature-icon">{{ feature.icon }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -234,7 +195,8 @@
 
         <div *ngIf="selectedCategory" class="category-hero">
           <div class="category-image" [ngClass]="'cat-image-' + selectedCategory.id">
-            <span *ngIf="selectedCategory.icon" class="category-icon">{{ selectedCategory.icon }}</span>
+            <img *ngIf="selectedCategory.icon && isImageUrl(selectedCategory.icon)" [src]="selectedCategory.icon" [alt]="selectedCategory.label" class="category-icon" />
+            <span *ngIf="selectedCategory.icon && !isImageUrl(selectedCategory.icon)" class="category-icon">{{ selectedCategory.icon }}</span>
           </div>
           <div class="category-text">
             <h3>{{ selectedCategory.label }}</h3>
@@ -251,7 +213,8 @@
           >
             <div class="menu-card-header">
               <div class="item-main">
-                <span *ngIf="item.icon" class="item-icon">{{ item.icon }}</span>
+                <img *ngIf="item.icon && isImageUrl(item.icon)" [src]="item.icon" [alt]="item.name" class="item-icon" />
+                <span *ngIf="item.icon && !isImageUrl(item.icon)" class="item-icon">{{ item.icon }}</span>
                 <h3 class="item-name">{{ item.name }}</h3>
               </div>
               <div class="price-card">
@@ -268,13 +231,15 @@
             <div class="selected-item-visual">
               <div class="selected-item-image-wrapper">
                 <div class="selected-item-image">
-                  <span *ngIf="selectedItem.icon" class="image-icon">{{ selectedItem.icon }}</span>
+                  <img *ngIf="selectedItem.icon && isImageUrl(selectedItem.icon)" [src]="selectedItem.icon" [alt]="selectedItem.name" class="image-icon" />
+                  <span *ngIf="selectedItem.icon && !isImageUrl(selectedItem.icon)" class="image-icon">{{ selectedItem.icon }}</span>
                 </div>
                 <button class="close-detail-btn" (click)="selectedItem = null" title="Close">×</button>
               </div>
               <div class="selected-item-header">
                 <div class="selected-item-main">
-                  <span *ngIf="selectedItem.icon" class="selected-item-icon">{{ selectedItem.icon }}</span>
+                  <img *ngIf="selectedItem.icon && isImageUrl(selectedItem.icon)" [src]="selectedItem.icon" [alt]="selectedItem.name" class="selected-item-icon" />
+                  <span *ngIf="selectedItem.icon && !isImageUrl(selectedItem.icon)" class="selected-item-icon">{{ selectedItem.icon }}</span>
                   <div class="selected-item-title-group">
                     <h3 class="selected-item-name">{{ selectedItem.name }}</h3>
                     <div *ngIf="selectedItem.rating" class="selected-item-rating">
@@ -386,30 +351,55 @@
             <p>Date: {{ bookingForm.date }} | Time: {{ bookingForm.time }}</p>
           </div>
 
-          <!-- Tables/Rooms Selection (like bus seats) -->
-          <div *ngIf="!showBookingForm && !bookingSuccess" class="booking-selection">
-            <h3 class="booking-subtitle">
-              Select a {{ bookingTab === 'table' ? 'Table' : 'Private Room' }}
-            </h3>
-            <div class="table-grid">
-              <div
-                *ngFor="let table of (bookingTab === 'table' ? tables : rooms)"
-                class="table-seat"
-                [class.available]="table.status === 'available'"
-                [class.booked]="table.status === 'booked'"
-                [class.selected]="table.status === 'selected'"
-                (click)="selectTable(table)"
-                [title]="table.status === 'booked' ? 'Already Booked' : 'Table ' + table.number + ' - Capacity: ' + table.capacity"
-              >
-                <div class="table-number">{{ table.number }}</div>
-                <div class="table-capacity">👥 {{ table.capacity }}</div>
-                <div class="table-status">
-                  <span *ngIf="table.status === 'available'">✓ Available</span>
-                  <span *ngIf="table.status === 'booked'">✗ Booked</span>
-                  <span *ngIf="table.status === 'selected'">★ Selected</span>
+          <!-- Restaurant Layout with Tables and Chairs -->
+          <div *ngIf="!showBookingForm && !bookingSuccess && bookingTab === 'table'" class="booking-selection">
+            <h3 class="booking-subtitle">Select Your Table</h3>
+            <div class="restaurant-layout">
+              <!-- Restaurant Floor Plan - Pentagonal Pattern -->
+              <div class="restaurant-floor-pentagon">
+                <!-- Center Table -->
+                <div
+                  *ngFor="let table of tables; let i = index"
+                  class="table-with-chairs"
+                  [class.available]="table.status === 'available'"
+                  [class.booked]="table.status === 'booked'"
+                  [class.selected]="table.status === 'selected'"
+                  [class.position-center]="table.position === 'center'"
+                  [class.position-corner]="table.position === 'corner'"
+                  [class.position-window]="table.position === 'window'"
+                  [class.position-door]="table.position === 'door'"
+                  [class.table-0]="i === 0"
+                  [class.table-1]="i === 1"
+                  [class.table-2]="i === 2"
+                  [class.table-3]="i === 3"
+                  [class.table-4]="i === 4"
+                  [class.table-5]="i === 5"
+                  [class.table-6]="i === 6"
+                  [class.table-7]="i === 7"
+                  [class.table-8]="i === 8"
+                  [class.table-9]="i === 9"
+                  (click)="selectTable(table)"
+                  [title]="getTableTitle(table)"
+                >
+                  <div class="table-visual">
+                    <div class="table-top"></div>
+                    <div class="chairs-container" [class.chairs-2]="table.capacity === 2" [class.chairs-4]="table.capacity === 4" [class.chairs-6]="table.capacity === 6">
+                      <div class="chair" *ngFor="let chair of getChairs(table.capacity); let i = index" [attr.data-index]="i">{{ getChairEmoji() }}</div>
+                    </div>
+                    <div class="table-label">
+                      <span class="table-label-number">{{ table.number }}</span>
+                      <span class="table-label-position">{{ getPositionLabel(table.position) }}</span>
+                    </div>
+                    <div class="table-status-badge" [class]="'status-' + table.status">
+                      <span *ngIf="table.status === 'available'">✓</span>
+                      <span *ngIf="table.status === 'booked'">✗</span>
+                      <span *ngIf="table.status === 'selected'">★</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            
             <div class="table-legend">
               <div class="legend-item">
                 <span class="legend-color available"></span>
@@ -422,6 +412,31 @@
               <div class="legend-item">
                 <span class="legend-color selected"></span>
                 <span>Selected</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Private Rooms Selection -->
+          <div *ngIf="!showBookingForm && !bookingSuccess && bookingTab === 'room'" class="booking-selection">
+            <h3 class="booking-subtitle">Select a Private Room</h3>
+            <div class="rooms-grid">
+              <div
+                *ngFor="let room of rooms"
+                class="room-card"
+                [class.available]="room.status === 'available'"
+                [class.booked]="room.status === 'booked'"
+                [class.selected]="room.status === 'selected'"
+                (click)="selectTable(room)"
+                [title]="room.status === 'booked' ? 'Already Booked' : 'Room ' + room.number + ' - Capacity: ' + room.capacity"
+              >
+                <div class="room-icon">🏠</div>
+                <div class="room-number">Room {{ room.number }}</div>
+                <div class="room-capacity">👥 {{ room.capacity }} people</div>
+                <div class="room-status">
+                  <span *ngIf="room.status === 'available'">✓ Available</span>
+                  <span *ngIf="room.status === 'booked'">✗ Booked</span>
+                  <span *ngIf="room.status === 'selected'">★ Selected</span>
+                </div>
               </div>
             </div>
           </div>
@@ -519,20 +534,11 @@
             to decadent desserts, every dish is a work of art crafted with passion and precision.
           </p>
           <div class="feature-row">
-            <div class="feature-card">
-              <div class="feature-icon">🍛</div>
-              <h3>Signature Biryani</h3>
-              <p>Our award-winning biryani, slow-cooked to perfection.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🍕</div>
-              <h3>Wood-Fired Pizzas</h3>
-              <p>Crispy crusts with premium toppings.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🍰</div>
-              <h3>Artisan Desserts</h3>
-              <p>Indulgent sweets that satisfy every craving.</p>
+            <div class="feature-card" *ngFor="let feature of offersFeatures">
+              <img *ngIf="feature.icon && isImageUrl(feature.icon)" [src]="feature.icon" [alt]="feature.title" class="feature-icon" />
+              <span *ngIf="feature.icon && !isImageUrl(feature.icon)" class="feature-icon">{{ feature.icon }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -546,20 +552,11 @@
             seating, and elegant decor create the perfect atmosphere for any occasion.
           </p>
           <div class="feature-row">
-            <div class="feature-card">
-              <div class="feature-icon">🕯️</div>
-              <h3>Intimate Lighting</h3>
-              <p>Soft, warm lights create a cozy dining atmosphere.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🪑</div>
-              <h3>Comfortable Seating</h3>
-              <p>Spacious tables and ergonomic chairs for your comfort.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🎵</div>
-              <h3>Curated Music</h3>
-              <p>Background music that enhances your dining experience.</p>
+            <div class="feature-card" *ngFor="let feature of ambianceFeatures">
+              <img *ngIf="feature.icon && isImageUrl(feature.icon)" [src]="feature.icon" [alt]="feature.title" class="feature-icon" />
+              <span *ngIf="feature.icon && !isImageUrl(feature.icon)" class="feature-icon">{{ feature.icon }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -573,20 +570,11 @@
             we've hosted countless memorable moments.
           </p>
           <div class="feature-row">
-            <div class="feature-card">
-              <div class="feature-icon">🎂</div>
-              <h3>Birthday Celebrations</h3>
-              <p>Make birthdays extra special with our celebration packages.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">💍</div>
-              <h3>Anniversaries</h3>
-              <p>Romantic settings for your special milestones.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🎊</div>
-              <h3>Corporate Events</h3>
-              <p>Professional spaces for business gatherings.</p>
+            <div class="feature-card" *ngFor="let feature of eventsFeatures">
+              <img *ngIf="feature.icon && isImageUrl(feature.icon)" [src]="feature.icon" [alt]="feature.title" class="feature-icon" />
+              <span *ngIf="feature.icon && !isImageUrl(feature.icon)" class="feature-icon">{{ feature.icon }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -696,25 +684,11 @@
             your dining experience exceptional.
           </p>
           <div class="feature-row">
-            <div class="feature-card">
-              <div class="feature-icon">👨‍🍳</div>
-              <h3>Master Chefs</h3>
-              <p>Experienced chefs with years of culinary expertise, bringing innovation to traditional recipes.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">👥</div>
-              <h3>Service Team</h3>
-              <p>Friendly and attentive staff dedicated to ensuring your comfort and satisfaction.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">🌿</div>
-              <h3>Kitchen Staff</h3>
-              <p>Skilled professionals who maintain the highest standards of hygiene and quality.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">💼</div>
-              <h3>Management</h3>
-              <p>Leadership team committed to continuous improvement and excellence.</p>
+            <div class="feature-card" *ngFor="let feature of teamFeatures">
+              <img *ngIf="feature.icon && isImageUrl(feature.icon)" [src]="feature.icon" [alt]="feature.title" class="feature-icon" />
+              <span *ngIf="feature.icon && !isImageUrl(feature.icon)" class="feature-icon">{{ feature.icon }}</span>
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.description }}</p>
             </div>
           </div>
         </div>
@@ -775,25 +749,14 @@
         <div class="social-block">
           <h3 class="social-title">Connect with us</h3>
           <div class="social-cards">
-            <div class="social-card">
-              <div class="social-card-icon">📸</div>
-              <h4 class="social-card-label">Instagram</h4>
-              <p class="social-card-value">@riza_restaurant</p>
-            </div>
-            <div class="social-card">
-              <div class="social-card-icon">🐦</div>
-              <h4 class="social-card-label">Twitter</h4>
-              <p class="social-card-value">@riza_restaurant</p>
-            </div>
-            <div class="social-card">
-              <div class="social-card-icon">📱</div>
-              <h4 class="social-card-label">WhatsApp</h4>
-              <p class="social-card-value">+91 80747 13306</p>
-            </div>
-            <div class="social-card">
-              <div class="social-card-icon">📍</div>
-              <h4 class="social-card-label">Location</h4>
-              <p class="social-card-value">123 Foodie Street, Gourmet City, 000000</p>
+            <div class="social-card" *ngFor="let social of socialMediaIcons">
+              <img *ngIf="social.icon && isImageUrl(social.icon)" [src]="social.icon" [alt]="social.label" class="social-card-icon" />
+              <span *ngIf="social.icon && !isImageUrl(social.icon)" class="social-card-icon">{{ social.icon }}</span>
+              <h4 class="social-card-label">{{ social.label }}</h4>
+              <p class="social-card-value" *ngIf="social.label === 'Instagram'">@riza_restaurant</p>
+              <p class="social-card-value" *ngIf="social.label === 'Twitter'">@riza_restaurant</p>
+              <p class="social-card-value" *ngIf="social.label === 'WhatsApp'">+91 80747 13306</p>
+              <p class="social-card-value" *ngIf="social.label === 'Location'">123 Foodie Street, Gourmet City, 000000</p>
             </div>
           </div>
         </div>

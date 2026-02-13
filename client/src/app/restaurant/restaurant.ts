@@ -36,6 +36,9 @@ interface Table {
   capacity: number;
   type: 'table' | 'room';
   status: 'available' | 'booked' | 'selected';
+  position: 'center' | 'corner' | 'window' | 'door' | 'private';
+  row: number;
+  col: number;
 }
 
 interface Booking {
@@ -61,6 +64,7 @@ export class Restaurant {
   topMenus = ['Home', 'Menu', 'Offers', 'Reservations', 'Gallery', 'Contact', 'About'];
   selectedTopMenu: string = 'Home';
   selectedSideMenuItem: string = '';
+  mobileMenuOpen: boolean = false;
 
   categories: MenuCategory[] = [
     {
@@ -70,7 +74,7 @@ export class Restaurant {
       icon: '🍽️',
       items: [
         { name: 'Crispy Corn Chaat', icon: '🌽', description: 'Golden fried corn tossed with tangy spices', detailedDescription: 'Fresh sweet corn kernels are deep-fried until golden and crispy, then tossed with a medley of tangy spices, fresh coriander, and a hint of lemon. Served with a side of mint chutney, this dish offers the perfect balance of crunch, sweetness, and spice. A popular street food favorite, elevated with RIZA\'s signature touch.', price: '₹220', rating: 4.5 },
-        { name: 'Tandoori Paneer Bites', icon: '🥘', description: 'Smoky cottage cheese with mint chutney', detailedDescription: 'Cubes of fresh paneer are marinated in a blend of yogurt, aromatic spices, and tandoori masala, then grilled to perfection in our clay oven. The result is a smoky, tender texture with a beautiful char. Served with cooling mint chutney and a squeeze of fresh lemon. A vegetarian delight that even meat lovers enjoy.', price: '₹260', badge: 'Chef\'s Special', rating: 4.8, options: ['Extra Mint Chutney', 'Extra Lemon', 'Onion Rings'] },
+        { name: 'Tandoori Paneer Bites', icon: '🧀', description: 'Smoky cottage cheese with mint chutney', detailedDescription: 'Cubes of fresh paneer are marinated in a blend of yogurt, aromatic spices, and tandoori masala, then grilled to perfection in our clay oven. The result is a smoky, tender texture with a beautiful char. Served with cooling mint chutney and a squeeze of fresh lemon. A vegetarian delight that even meat lovers enjoy.', price: '₹260', badge: 'Chef\'s Special', rating: 4.8, options: ['Extra Mint Chutney', 'Extra Lemon', 'Onion Rings'] },
         { name: 'Chicken 65', icon: '🍗', description: 'Spicy South Indian style fried chicken', detailedDescription: 'Tender chicken pieces are marinated in a secret blend of South Indian spices, including red chili, curry leaves, and garlic, then deep-fried until perfectly crispy. The dish gets its name from the 65 spices used in the original recipe. Served hot with a garnish of fresh curry leaves and green chilies. Bold, fiery, and incredibly addictive.', price: '₹280', rating: 4.6, options: ['Extra Spicy', 'Lemon Wedges', 'Onion Rings'] },
         { name: 'Spring Rolls', icon: '🥟', description: 'Crispy vegetable rolls with sweet chilli sauce', detailedDescription: 'Delicate spring roll wrappers are filled with a colorful mix of finely chopped vegetables including carrots, cabbage, bell peppers, and bean sprouts, seasoned with soy sauce and aromatic spices. Deep-fried until golden and crispy, served with a house-made sweet chili dipping sauce. Light, crunchy, and perfect for sharing.', price: '₹240', rating: 4.4 },
         { name: 'Paneer Tikka', icon: '🧀', description: 'Marinated cottage cheese grilled to perfection', detailedDescription: 'Chunks of premium paneer are marinated overnight in a rich blend of yogurt, ginger-garlic paste, garam masala, and turmeric. Skewered and grilled in the tandoor until slightly charred on the edges while remaining soft and creamy inside. Served with tangy tamarind chutney and fresh onion rings. A classic that never disappoints.', price: '₹270', rating: 4.5, options: ['Extra Chutney', 'Onion Rings', 'Lemon Wedges'] },
@@ -178,6 +182,57 @@ export class Restaurant {
   selectedCategoryId: string = 'starters';
   selectedItem: MenuItem | null = null;
 
+  // Feature icons for Home page
+  overviewFeatures = [
+    { icon: '🍽️', title: 'Fine Dining', description: 'Exquisite cuisine crafted by master chefs.' },
+    { icon: '🌿', title: 'Fresh Ingredients', description: 'Locally sourced, seasonal produce.' },
+    { icon: '✨', title: 'Ambiance', description: 'Cozy lighting and music for every mood.' },
+    { icon: '👨‍🍳', title: 'Expert Chefs', description: 'Passionate chefs bringing years of culinary experience to your plate.' },
+    { icon: '⏱️', title: 'Quick Service', description: 'Thoughtfully planned kitchen flow ensures minimal waiting time.' },
+    { icon: '🏡', title: 'Family Friendly', description: 'A welcoming space for family gatherings, kids and celebrations.' }
+  ];
+
+  featuresList = [
+    { icon: '🎯', title: 'Quality First', description: 'We source only the finest ingredients and maintain the highest standards in every dish we serve.' },
+    { icon: '🌟', title: 'Award Winning', description: 'Recognized for excellence in culinary arts and customer service.' },
+    { icon: '💎', title: 'Premium Experience', description: 'Every detail is carefully curated to provide you with an unforgettable dining experience.' },
+    { icon: '🔥', title: 'Innovative Cuisine', description: 'Our chefs blend traditional recipes with modern techniques to create unique flavors.' },
+    { icon: '🌍', title: 'Global Inspiration', description: 'Influences from around the world come together in our diverse menu offerings.' },
+    { icon: '❤️', title: 'Passion Driven', description: 'Every dish is prepared with love and dedication to bring you the best.' }
+  ];
+
+  offersFeatures = [
+    { icon: '🍛', title: 'Signature Biryani', description: 'Our most loved biryani at special prices.' },
+    { icon: '🍕', title: 'Wood-Fired Pizzas', description: 'Authentic Italian pizzas with fresh ingredients.' },
+    { icon: '🍰', title: 'Artisan Desserts', description: 'Handcrafted desserts made daily.' }
+  ];
+
+  ambianceFeatures = [
+    { icon: '🕯️', title: 'Intimate Lighting', description: 'Warm, ambient lighting creates the perfect mood.' },
+    { icon: '🪑', title: 'Comfortable Seating', description: 'Spacious and comfortable seating for all.' },
+    { icon: '🎵', title: 'Curated Music', description: 'Carefully selected music to enhance your dining experience.' }
+  ];
+
+  eventsFeatures = [
+    { icon: '🎂', title: 'Birthday Celebrations', description: 'Make your special day memorable with us.' },
+    { icon: '💍', title: 'Anniversaries', description: 'Celebrate your love story with a romantic dinner.' },
+    { icon: '🎊', title: 'Corporate Events', description: 'Host your business meetings and team lunches.' }
+  ];
+
+  teamFeatures = [
+    { icon: '👨‍🍳', title: 'Master Chefs', description: 'Experienced chefs with years of culinary expertise.' },
+    { icon: '👥', title: 'Service Team', description: 'Friendly and attentive service staff.' },
+    { icon: '🌿', title: 'Kitchen Staff', description: 'Dedicated team ensuring quality in every dish.' },
+    { icon: '💼', title: 'Management', description: 'Leadership team committed to excellence.' }
+  ];
+
+  socialMediaIcons = [
+    { icon: '📸', label: 'Instagram' },
+    { icon: '🐦', label: 'Twitter' },
+    { icon: '📱', label: 'WhatsApp' },
+    { icon: '📍', label: 'Location' }
+  ];
+
   // Booking system
   bookingTab: 'table' | 'room' = 'table';
   tables: Table[] = [];
@@ -249,29 +304,32 @@ export class Restaurant {
   }
 
   initializeTables(): void {
-    // Regular tables (like bus seats)
+    // Pentagonal/Star pattern: 1 center + 4 corners + 5 additional tables
     this.tables = [
-      { id: 't1', number: 1, capacity: 2, type: 'table', status: 'available' },
-      { id: 't2', number: 2, capacity: 2, type: 'table', status: 'available' },
-      { id: 't3', number: 3, capacity: 4, type: 'table', status: 'available' },
-      { id: 't4', number: 4, capacity: 4, type: 'table', status: 'available' },
-      { id: 't5', number: 5, capacity: 2, type: 'table', status: 'available' },
-      { id: 't6', number: 6, capacity: 4, type: 'table', status: 'available' },
-      { id: 't7', number: 7, capacity: 6, type: 'table', status: 'available' },
-      { id: 't8', number: 8, capacity: 2, type: 'table', status: 'available' },
-      { id: 't9', number: 9, capacity: 4, type: 'table', status: 'available' },
-      { id: 't10', number: 10, capacity: 4, type: 'table', status: 'available' },
-      { id: 't11', number: 11, capacity: 2, type: 'table', status: 'available' },
-      { id: 't12', number: 12, capacity: 6, type: 'table', status: 'available' }
+      // Center table
+      { id: 't5', number: 5, capacity: 6, type: 'table', status: 'available', position: 'center', row: 0, col: 0 },
+      
+      // Corner tables (4 corners in pentagon pattern)
+      { id: 't1', number: 1, capacity: 4, type: 'table', status: 'available', position: 'corner', row: 0, col: 0 },
+      { id: 't2', number: 2, capacity: 4, type: 'table', status: 'available', position: 'corner', row: 0, col: 0 },
+      { id: 't3', number: 3, capacity: 4, type: 'table', status: 'available', position: 'corner', row: 0, col: 0 },
+      { id: 't4', number: 4, capacity: 4, type: 'table', status: 'available', position: 'corner', row: 0, col: 0 },
+      
+      // Additional tables positioned around
+      { id: 't6', number: 6, capacity: 2, type: 'table', status: 'available', position: 'window', row: 0, col: 0 },
+      { id: 't7', number: 7, capacity: 2, type: 'table', status: 'available', position: 'door', row: 0, col: 0 },
+      { id: 't8', number: 8, capacity: 4, type: 'table', status: 'available', position: 'window', row: 0, col: 0 },
+      { id: 't9', number: 9, capacity: 2, type: 'table', status: 'available', position: 'door', row: 0, col: 0 },
+      { id: 't10', number: 10, capacity: 4, type: 'table', status: 'available', position: 'window', row: 0, col: 0 }
     ];
 
     // Private rooms
     this.rooms = [
-      { id: 'r1', number: 1, capacity: 8, type: 'room', status: 'available' },
-      { id: 'r2', number: 2, capacity: 10, type: 'room', status: 'available' },
-      { id: 'r3', number: 3, capacity: 12, type: 'room', status: 'available' },
-      { id: 'r4', number: 4, capacity: 15, type: 'room', status: 'available' },
-      { id: 'r5', number: 5, capacity: 20, type: 'room', status: 'available' }
+      { id: 'r1', number: 1, capacity: 8, type: 'room', status: 'available', position: 'private', row: 0, col: 0 },
+      { id: 'r2', number: 2, capacity: 10, type: 'room', status: 'available', position: 'private', row: 0, col: 0 },
+      { id: 'r3', number: 3, capacity: 12, type: 'room', status: 'available', position: 'private', row: 0, col: 0 },
+      { id: 'r4', number: 4, capacity: 15, type: 'room', status: 'available', position: 'private', row: 0, col: 0 },
+      { id: 'r5', number: 5, capacity: 20, type: 'room', status: 'available', position: 'private', row: 0, col: 0 }
     ];
   }
 
@@ -517,6 +575,8 @@ export class Restaurant {
     if (this.selectedTopMenu === 'Menu') {
       this.selectCategory(item.id);
     }
+    // Close mobile menu after selection
+    this.closeMobileMenu();
   }
 
   selectItem(item: MenuItem): void {
@@ -531,6 +591,82 @@ export class Restaurant {
       stars += '⭐';
     }
     return stars;
+  }
+
+  isImageUrl(icon: string | undefined): boolean {
+    if (!icon) return false;
+    // Check if it's an emoji/unicode (not a file path)
+    // Emojis are typically 1-4 characters and match emoji patterns
+    const emojiPattern = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]/u;
+    if (emojiPattern.test(icon)) {
+      return false;
+    }
+    // If it's a short string and doesn't look like a URL or path, it's likely an emoji
+    if (icon.length <= 4 && !icon.includes('.') && !icon.includes('/') && !icon.includes(':')) {
+      return false;
+    }
+    return icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('data:') || icon.startsWith('/') || icon.startsWith('assets/');
+  }
+
+  getIconPath(iconName: string): string {
+    return `assets/images/icons/${iconName}.png`;
+  }
+
+  getItemIconPath(itemName: string): string {
+    const name = itemName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return this.getIconPath(`item-${name}`);
+  }
+
+  getCategoryIconPath(categoryId: string): string {
+    return this.getIconPath(`category-${categoryId}`);
+  }
+
+  getFeatureIconPath(featureName: string): string {
+    const name = featureName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return this.getIconPath(`feature-${name}`);
+  }
+
+  getSideMenuIconPath(menuId: string): string {
+    return this.getIconPath(`side-${menuId}`);
+  }
+
+  getSocialIconPath(socialName: string): string {
+    return this.getIconPath(`social-${socialName.toLowerCase()}`);
+  }
+
+  getChairs(capacity: number): number[] {
+    return Array(capacity).fill(0).map((_, i) => i);
+  }
+
+  getChairEmoji(): string {
+    return '🪑';
+  }
+
+  getPositionLabel(position: string): string {
+    const labels: { [key: string]: string } = {
+      'window': 'Window',
+      'center': 'Center',
+      'door': 'Near Door',
+      'corner': 'Corner',
+      'private': 'Private'
+    };
+    return labels[position] || position;
+  }
+
+  getTableTitle(table: Table): string {
+    const position = this.getPositionLabel(table.position);
+    const status = table.status === 'booked' ? 'Already Booked' : 
+                   table.status === 'selected' ? 'Selected' : 
+                   'Available';
+    return `Table ${table.number} - ${position} - Capacity: ${table.capacity} - ${status}`;
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
   }
 
   logout(): void {
